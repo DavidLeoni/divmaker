@@ -49,7 +49,7 @@ public class DivMakerTest {
         c.toLMF();
         LOG.info("Created lexical resource in memory!");
 
-        File outFile = new File("mywordnet.xml");
+        File outFile = new File("target/wn30.xml");
         if (outFile.exists()) {
             outFile.delete();
         }

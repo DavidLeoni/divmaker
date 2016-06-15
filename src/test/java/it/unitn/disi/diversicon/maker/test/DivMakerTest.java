@@ -65,7 +65,7 @@ public class DivMakerTest {
         }
         lexicalResourceToXml(lr, outFile);
 
-        File outDb = new File("target/wn30");
+        String outDb = "target/wn30";
         xmlToDb(outFile, outDb);
         checkDb(outDb);
 
@@ -218,33 +218,31 @@ public class DivMakerTest {
     @Test
     public void testXmlDumpToDb() {
         File xmlDump = getDump("dumps/wn30.xml");
-        File outDb = new File("target/wn30-from-dump");
-        assertFalse(outDb.exists());
+        String outDb = "target/wn30-from-dump";        
         xmlToDb(xmlDump, outDb);
         checkDb(outDb);
     }
 
-    private void checkDb(File outDb) {
+    private void checkDb(String outDbPath) {                       
+        File outDb = new File(outDbPath + ".h2.db");
         assertTrue(outDb.exists());
         assertTrue(outDb.length() > 1000000);
     }
 
-    private void xmlToDb(File inputXml, File outDb) {
-
+    private void xmlToDb(File inputXml, String outDb) {       
+        
         try {
             if (!inputXml.exists()) {
                 throw new RuntimeException("Input xml doesn't exist! Path is: " + inputXml.getAbsolutePath());
             }
 
-            if (outDb.exists()) {
-                outDb.delete();
-            }
-            LOG.info("Going to populate H2 DB " + outDb.getAbsolutePath() + "...");
+            
+            LOG.info("Going to populate H2 DB " + outDb + "...");
 
             DBConfig dbConfig = new DBConfig();
             dbConfig.setDb_vendor("de.tudarmstadt.ukp.lmf.hibernate.UBYH2Dialect");
             dbConfig.setJdbc_driver_class("org.h2.Driver");
-            dbConfig.setJdbc_url("jdbc:h2:file:" + outDb.getAbsolutePath());
+            dbConfig.setJdbc_url("jdbc:h2:file:" + outDb);
             dbConfig.setUser("root");
             dbConfig.setPassword("pass");
 
@@ -254,7 +252,7 @@ public class DivMakerTest {
 
             dbWriter.transform(inputXml, "wn30");
 
-            LOG.info("db saved: " + outDb.getAbsolutePath());
+            LOG.info("db saved: " + outDb);
 
         } catch (Exception ex) {
             throw new RuntimeException("Error while writing db!", ex);

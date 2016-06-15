@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.lmf.model.core.LexicalResource;
+import de.tudarmstadt.ukp.lmf.transform.DBConfig;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
+import de.tudarmstadt.ukp.lmf.transform.XMLToDBTransformer;
 import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
@@ -53,7 +55,10 @@ public class DivMakerTest {
         if (outFile.exists()) {
             outFile.delete();
         }
-        writeIt(lr, outFile);
+        lexicalResourceToXml(lr, outFile);
+        
+        File outDb = new File("target/wn30_db");
+        xmlToDb(outFile, outDb);               
 
     }
 
@@ -129,11 +134,11 @@ public class DivMakerTest {
         converterWN.toLMF();
         lexicalResource = converterWN.getLexicalResource();
 
-        return writeIt(lexicalResource, lmfXML);
+        return lexicalResourceToXml(lexicalResource, lmfXML);
 
     }
 
-    private File writeIt(LexicalResource lexicalResource, File lmfXML) {
+    private File lexicalResourceToXml(LexicalResource lexicalResource, File lmfXML) {
         try {
             LOG.info("Going to create XML...");
 
@@ -141,11 +146,41 @@ public class DivMakerTest {
             xmlWriter.writeElement(lexicalResource);
             xmlWriter.writeEndDocument();
 
-            LOG.info("temp file saved: " + lmfXML.getAbsolutePath());
+            LOG.info("xml file saved: " + lmfXML.getAbsolutePath());
 
             return lmfXML;
         } catch (Exception ex) {
             throw new RuntimeException("Error while writing LMF XML!", ex);
+        }
+    }
+    
+    private void xmlToDb(File inputXml, File outDb) {
+        
+        try {
+            if (!inputXml.exists()){
+                throw new RuntimeException("Input xml doesn't exist! Path is: " + inputXml.getAbsolutePath());
+            }
+            
+            if (outDb.exists()){
+                outDb.delete();
+            }
+            LOG.info("Going to populate H2 DB " + outDb.getAbsolutePath() +  "...");
+
+            DBConfig config = new DBConfig();
+            config.setDb_vendor("de.tudarmstadt.ukp.lmf.hibernate.UBYH2Dialect");
+            config.setJdbc_driver_class("org.h2.Driver");
+            config.setJdbc_url("jdbc:h2:file:"+outDb.getAbsolutePath());
+            config.setUser("root");
+            config.setPassword("pass");
+            
+            XMLToDBTransformer dbWriter = new XMLToDBTransformer(config);
+            
+            dbWriter.transform(inputXml, "wn30");
+
+            LOG.info("db saved: " + outDb.getAbsolutePath());
+            
+        } catch (Exception ex) {
+            throw new RuntimeException("Error while writing db!", ex);
         }
     }
 }

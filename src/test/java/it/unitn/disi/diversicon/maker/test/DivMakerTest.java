@@ -1,5 +1,8 @@
 package it.unitn.disi.diversicon.maker.test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -15,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.lmf.model.core.LexicalResource;
 import de.tudarmstadt.ukp.lmf.transform.DBConfig;
+import de.tudarmstadt.ukp.lmf.transform.LMFDBUtils;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
 import de.tudarmstadt.ukp.lmf.transform.XMLToDBTransformer;
 import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
@@ -57,8 +61,9 @@ public class DivMakerTest {
         }
         lexicalResourceToXml(lr, outFile);
         
-        File outDb = new File("target/wn30_db");
-        xmlToDb(outFile, outDb);               
+        File outDb = new File("target/wn30");
+        xmlToDb(outFile, outDb);  
+        checkDb(outDb);
 
     }
 
@@ -154,6 +159,20 @@ public class DivMakerTest {
         }
     }
     
+    @Test    
+    public void testXmlDumpToDb(){
+        File xmlDump = new File("dumps/wn30.xml");
+        File outDb = new File("target/wn30-from-dump");
+        assertFalse(outDb.exists());
+        xmlToDb(xmlDump, outDb);
+        checkDb(outDb);
+    }
+    
+    private void checkDb(File outDb){
+        assertTrue(outDb.exists());
+        assertTrue(outDb.length() > 1000000);
+    }
+    
     private void xmlToDb(File inputXml, File outDb) {
         
         try {
@@ -166,14 +185,18 @@ public class DivMakerTest {
             }
             LOG.info("Going to populate H2 DB " + outDb.getAbsolutePath() +  "...");
 
-            DBConfig config = new DBConfig();
-            config.setDb_vendor("de.tudarmstadt.ukp.lmf.hibernate.UBYH2Dialect");
-            config.setJdbc_driver_class("org.h2.Driver");
-            config.setJdbc_url("jdbc:h2:file:"+outDb.getAbsolutePath());
-            config.setUser("root");
-            config.setPassword("pass");
             
-            XMLToDBTransformer dbWriter = new XMLToDBTransformer(config);
+            
+            DBConfig dbConfig = new DBConfig();
+            dbConfig.setDb_vendor("de.tudarmstadt.ukp.lmf.hibernate.UBYH2Dialect");
+            dbConfig.setJdbc_driver_class("org.h2.Driver");
+            dbConfig.setJdbc_url("jdbc:h2:file:"+outDb.getAbsolutePath());
+            dbConfig.setUser("root");
+            dbConfig.setPassword("pass");
+            
+            LMFDBUtils.createTables(dbConfig);
+            
+            XMLToDBTransformer dbWriter = new XMLToDBTransformer(dbConfig);
             
             dbWriter.transform(inputXml, "wn30");
 

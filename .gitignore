@@ -1,5 +1,7 @@
 
 
+/dumps/*.xml
+
 ##### MAVEN
 
 target/*

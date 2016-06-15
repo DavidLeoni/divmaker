@@ -3,7 +3,10 @@ package it.unitn.disi.diversicon.maker.test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.xml.stream.XMLStreamException;
@@ -14,6 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tukaani.xz.XZInputStream;
 import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.lmf.model.core.LexicalResource;
@@ -60,10 +64,59 @@ public class DivMakerTest {
             outFile.delete();
         }
         lexicalResourceToXml(lr, outFile);
-        
+
         File outDb = new File("target/wn30");
-        xmlToDb(outFile, outDb);  
+        xmlToDb(outFile, outDb);
         checkDb(outDb);
+
+    }
+
+    public File getDump(String str) {
+        return getDump(new File(str));
+    }
+    /**
+     * Expects a .xml file. If not found, a file .xml.xz
+     *  is searched and decompressed in same folder and returned
+
+     */
+    public File getDump(File file) {
+        
+        if (file.getAbsolutePath()
+                .endsWith(".xml")) {
+            if (file.exists()){
+                return file;
+            } else {
+                
+                File xz = new File(file.getAbsolutePath() + ".xz");
+
+                if (!xz.exists()){
+                    throw new IllegalStateException("Couldn't find file " + xz.getAbsolutePath() + " to decompress!");
+                }
+                
+                LOG.info("Decompressing " + xz.getAbsolutePath() + " ...");
+                try {
+                    FileInputStream fin = new FileInputStream(xz);
+                    BufferedInputStream in = new BufferedInputStream(fin);
+                    FileOutputStream out = new FileOutputStream(file);
+                    XZInputStream xzIn = new XZInputStream(in);
+                    final byte[] buffer = new byte[8192];
+                    int n = 0;
+                    while (-1 != (n = xzIn.read(buffer))) {
+                        out.write(buffer, 0, n);
+                    }
+                    out.close();
+                    xzIn.close();
+                    LOG.info("Wrote " + file.getAbsolutePath() + " file.");
+                    return file;
+                } catch (Exception e) {
+                    throw new RuntimeException("Error while decompressing " + file.getAbsolutePath(), e);
+                }
+
+            }
+
+        } else {
+            throw new IllegalArgumentException("Unsupported input file extension for file " + file.getAbsolutePath());
+        }
 
     }
 
@@ -75,6 +128,9 @@ public class DivMakerTest {
         lexicon2XML("wn30/", outFile);
     }
 
+    /**
+     * Copied from ubycreate-gpl
+     */
     public File lexicon2XML(String source, File lmfXML)
             throws IOException, XMLStreamException, SAXException, DocumentException, JWNLException {
 
@@ -158,50 +214,48 @@ public class DivMakerTest {
             throw new RuntimeException("Error while writing LMF XML!", ex);
         }
     }
-    
-    @Test    
-    public void testXmlDumpToDb(){
-        File xmlDump = new File("dumps/wn30.xml");
+
+    @Test
+    public void testXmlDumpToDb() {
+        File xmlDump = getDump("dumps/wn30.xml");
         File outDb = new File("target/wn30-from-dump");
         assertFalse(outDb.exists());
         xmlToDb(xmlDump, outDb);
         checkDb(outDb);
     }
-    
-    private void checkDb(File outDb){
+
+    private void checkDb(File outDb) {
         assertTrue(outDb.exists());
         assertTrue(outDb.length() > 1000000);
     }
-    
+
     private void xmlToDb(File inputXml, File outDb) {
-        
+
         try {
-            if (!inputXml.exists()){
+            if (!inputXml.exists()) {
                 throw new RuntimeException("Input xml doesn't exist! Path is: " + inputXml.getAbsolutePath());
             }
-            
-            if (outDb.exists()){
+
+            if (outDb.exists()) {
                 outDb.delete();
             }
-            LOG.info("Going to populate H2 DB " + outDb.getAbsolutePath() +  "...");
+            LOG.info("Going to populate H2 DB " + outDb.getAbsolutePath() + "...");
 
-            
-            
             DBConfig dbConfig = new DBConfig();
             dbConfig.setDb_vendor("de.tudarmstadt.ukp.lmf.hibernate.UBYH2Dialect");
             dbConfig.setJdbc_driver_class("org.h2.Driver");
-            dbConfig.setJdbc_url("jdbc:h2:file:"+outDb.getAbsolutePath());
+            dbConfig.setJdbc_url("jdbc:h2:file:" + outDb.getAbsolutePath());
             dbConfig.setUser("root");
             dbConfig.setPassword("pass");
-            
+
             LMFDBUtils.createTables(dbConfig);
-            
+
             XMLToDBTransformer dbWriter = new XMLToDBTransformer(dbConfig);
-            
+
             dbWriter.transform(inputXml, "wn30");
 
             LOG.info("db saved: " + outDb.getAbsolutePath());
-            
+
         } catch (Exception ex) {
             throw new RuntimeException("Error while writing db!", ex);
         }

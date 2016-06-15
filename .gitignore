@@ -1,6 +1,8 @@
 
 
 /dumps/*.xml
+/dumps/*.db
+
 
 ##### MAVEN
 

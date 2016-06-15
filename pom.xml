@@ -15,7 +15,7 @@
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Diversicon</name>
+	<name>DivMaker</name>
 	<url>https://github.com/DavidLeoni/divercli</url>
 	<description>Quick and dirty interface to generate LMF XMLs .</description>
 
@@ -149,11 +149,13 @@
 		    <version>0.0.7</version>
 		</dependency>
 
-		<dependency>
+		<!--  <dependency>
 			<groupId>it.unitn.disi</groupId>
 			<artifactId>diversicon</artifactId>
 			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
+		
+		 -->
 
 		<dependency>
 		  <groupId>com.beust</groupId>

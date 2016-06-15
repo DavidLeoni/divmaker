@@ -284,14 +284,14 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
+		<!--  <dependency>
 			<groupId>it.unitn.disi</groupId>
 			<artifactId>diversicon</artifactId>
 			<type>test-jar</type>
 			<version>${diversicon.version}</version>
 			<scope>test</scope>
 		</dependency>
-
+		-->
 
 	</dependencies>
 

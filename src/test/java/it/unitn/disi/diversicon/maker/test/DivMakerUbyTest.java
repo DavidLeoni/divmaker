@@ -63,7 +63,7 @@ public class DivMakerUbyTest {
     private static final String TARGET_UBY = "target/uby/";
 
     @BeforeClass
-    public void beforeClass(){
+    public static void beforeClass(){
         try {
             Files.createDirectories(Paths.get("target", "uby"));            
         } catch (IOException e) {        
@@ -156,20 +156,29 @@ public class DivMakerUbyTest {
     }
 
     @Test
-    @Ignore
-    public void testCreateImportWn30()
+    public void testCreateWn30Xml()
             throws IOException, JWNLException, XMLStreamException, SAXException, DocumentException {
-        File outFile = new File("mywordnet.xml");
-        lexicon2XML("wn30/", outFile);
+        String version = "3.0";
+        File outFile = new File("mywordnet-" + version + ".xml");
+        wordnet2XML("wn30/", outFile, version);
+    }
+    
+    @Test    
+    public void testCreateWn31Xml()
+            throws IOException, JWNLException, XMLStreamException, SAXException, DocumentException {
+        String version = "3.1";
+        File outFile = new File("mywordnet-"+version+".xml");
+        wordnet2XML("wn31/", outFile, version);
     }
 
     /**
      * Copied from ubycreate-gpl
+     * 
+     * @param version i.e. "3.0"
      */
-    public File lexicon2XML(String source, File lmfXML)
+    public File wordnet2XML(String source, File lmfXML, String version)
             throws IOException, XMLStreamException, SAXException, DocumentException, JWNLException {
-
-        String lexicalResourceName = "WordNet_3.0_eng";
+        
 
         /* Dumping lexical into a file */
 
@@ -181,7 +190,7 @@ public class DivMakerUbyTest {
                                .getInstance(IOUtils.toInputStream(
                                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                                                + "<jwnl_properties language=\"en\">"
-                                               + "  <version publisher=\"Princeton\" number=\"3.0\" language=\"en\"/>"
+                                               + "  <version publisher=\"Princeton\" number=\""+version+"\" language=\"en\"/>"
                                                + "  <dictionary class=\"net.sf.extjwnl.dictionary.FileBackedDictionary\">"
                                                + "    <param name=\"morphological_processor\" value=\"net.sf.extjwnl.dictionary.morph.DefaultMorphologicalProcessor\">"
                                                + "      <param name=\"operations\">"
@@ -226,13 +235,15 @@ public class DivMakerUbyTest {
                                                + "</jwnl_properties>"));
 
         WNConverter converterWN = new WNConverter(wnPath, extWordnet, new LexicalResource(),
-                lexicalResourceName, dtdVersion);
+                "WordNet_" + version + "_eng", dtdVersion);
         converterWN.toLMF();
         lexicalResource = converterWN.getLexicalResource();
 
         return lexicalResourceToXml(lexicalResource, lmfXML);
 
     }
+    
+    
 
     private File lexicalResourceToXml(LexicalResource lexicalResource, File lmfXML) {
         try {

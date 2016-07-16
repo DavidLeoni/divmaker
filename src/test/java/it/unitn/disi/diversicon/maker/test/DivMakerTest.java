@@ -3,35 +3,17 @@ package it.unitn.disi.diversicon.maker.test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentException;
-import org.h2.tools.RunScript;
-import org.h2.tools.Script;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,13 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.tukaani.xz.XZInputStream;
 import org.xml.sax.SAXException;
 
-import de.tudarmstadt.ukp.lmf.hibernate.HibernateConnect;
 import de.tudarmstadt.ukp.lmf.model.core.LexicalResource;
 import de.tudarmstadt.ukp.lmf.transform.DBConfig;
-import de.tudarmstadt.ukp.lmf.transform.LMFDBUtils;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
 import de.tudarmstadt.ukp.lmf.transform.XMLToDBTransformer;
 import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
+import it.unitn.disi.diversicon.Diversicon;
 import it.unitn.disi.diversicon.Diversicons;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
@@ -68,9 +49,9 @@ public class DivMakerTest {
     private static final String WN30_DIV = "div-wn30";
 
     @BeforeClass
-    public void beforeClass(){
+    public static void beforeClass(){
         try {
-            Files.createDirectories(Paths.get("target", "uby"));            
+            Files.createDirectories(Paths.get("target", "div"));            
         } catch (IOException e) {        
             throw new RuntimeException("Something went wrong!", e);
         }        
@@ -238,7 +219,7 @@ public class DivMakerTest {
 
     }
 
-    private File lexicalResourceToXml(LexicalResource lexicalResource, File lmfXML) {
+    public File lexicalResourceToXml(LexicalResource lexicalResource, File lmfXML) {
         try {
             LOG.info("Going to create XML...");
 
@@ -265,73 +246,47 @@ public class DivMakerTest {
 
     @Test
     public void testDbToSql() {
-        Diversicons.restoreH2Dump(TARGET_DIV + WN30_DIV, 
-                Diversicons.makeDefaultH2FileDbConfig(DUMPS_DIVERSICON + WN30_DIV));
+        DBConfig dbConfig = Diversicons.makeDefaultH2InMemoryDbConfig("mydb", false);
+        Diversicons.dropCreateTables(dbConfig);
+        Diversicon div = Diversicon.connectToDb(dbConfig);
+        div.importXml("dumps/uby/uby-wn30.xml.xz");
+        String zipFilePath = TARGET_DIV + WN30_DIV + ".sql.zip";
+        div.exportToSql(zipFilePath, true);
+        assertTrue(new File(zipFilePath).exists());
+        div.getSession().close();
     }
 
     @Test
     public void testRestoreFileDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
-        Diversicons.restoreH2Dump(DUMPS_DIVERSICON + WN30_DIV + ".zip",
-                    Diversicons.makeDefaultH2FileDbConfig(tempDir.toString() + "/temp-db"));
+        Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".zip",
+                    Diversicons.makeDefaultH2FileDbConfig(tempDir.toString() + "/temp-db", true));
     }
 
     @Test
     public void testRestoreZipToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
-        Diversicons.restoreH2Dump(DUMPS_DIVERSICON + WN30_DIV + ".zip", 
-                Diversicons.makeDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db"));
+        Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".zip", 
+                Diversicons.makeDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db", false));
     }
     
     @Test
     public void testRestoreSqlToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
-        Diversicons.restoreH2Dump(DUMPS_DIVERSICON + WN30_DIV + ".sql", 
-                Diversicons.makeDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db"));
+        Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".sql", 
+                Diversicons.makeDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db", false));
     }
 
 
-    static InputStream getInputStream(File file) {
-
-        FileInputStream fileInputStream;
-        try {
-            fileInputStream = new FileInputStream(file);
-        } catch (FileNotFoundException ex) {            
-            throw new RuntimeException("Error while getting input stream!", ex);
-        }
-        String absPath = file.getAbsolutePath();
-        if (absPath
-                .endsWith(".zip")) {
-            try {
-                ZipInputStream zin = new ZipInputStream(fileInputStream);
-                for (ZipEntry e; (e = zin.getNextEntry()) != null;) {
-                    if (!e.getName().endsWith(".sql")){
-                        throw new RuntimeException("Expected .sql file inside zip, found instead "
-                                + e.getName());
-                    }
-                    return zin;
-                }
-                throw new EOFException("Cannot find file!");
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        } else if (absPath.endsWith(".sql")){
-            return fileInputStream; 
-        } else {
-            throw new RuntimeException("Expected .sql or .zip file, found instead " + file.getAbsolutePath());
-        }
-    }
-
- 
-
-    private void checkDb(String outDbPath) {
+   
+    public void checkDb(String outDbPath) {
         File outDb = new File(outDbPath + ".h2.db");
         assertTrue(outDb.exists());
         assertTrue(outDb.length() > 1000000);
     }
     
 
-    private void xmlToDb(File inputXml, String outDb) {
+    public void xmlToDb(File inputXml, String outDb) {
 
         try {
             if (!inputXml.exists()) {
@@ -340,7 +295,7 @@ public class DivMakerTest {
 
             LOG.info("Going to populate H2 DB " + outDb + "...");
 
-            DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(outDb);
+            DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(outDb, false);
 
             Diversicons.dropCreateTables(dbConfig);
 

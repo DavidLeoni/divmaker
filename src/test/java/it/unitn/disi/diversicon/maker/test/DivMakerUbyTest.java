@@ -1,13 +1,12 @@
 package it.unitn.disi.diversicon.maker.test;
 
+import static it.unitn.disi.diversicon.internal.Internals.checkNotBlank;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,16 +24,13 @@ import java.util.zip.ZipInputStream;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentException;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tukaani.xz.XZInputStream;
 import org.xml.sax.SAXException;
 
 import de.tudarmstadt.ukp.lmf.model.core.LexicalResource;
@@ -71,179 +67,68 @@ public class DivMakerUbyTest {
         }        
     }
     
-    @Test
-    public void testImportWn30() throws IOException, JWNLException {
-
-        Dictionary dictionary = Dictionary.getDefaultResourceInstance();
+    /**
+     * @param version i.e. "3.1"
+     */
+    public File wordnet2Xml(String version){
+        checkNotBlank(version, "Invalid version!");
+                
+        String versionWithoutDot = version.replace(".", "");
+        
+        Dictionary dictionary;
+        try {
+            dictionary = Dictionary.getResourceInstance("/net/sf/extjwnl/data/wordnet/wn"+versionWithoutDot+"/res_properties.xml");
+        } catch (JWNLException e) {        
+            throw new RuntimeException("Something went wrong!", e);
+        }
 
         if (dictionary == null) {
             throw new RuntimeException("no dictionary!");
-
         }
 
         LexicalResource lr = new LexicalResource();
 
-        WNConverter c = new WNConverter(new File("wn30/"),
+        WNConverter c = new WNConverter(new File("wn" + versionWithoutDot + "/"),
                 dictionary,
                 lr,
-                "3.0",
+                version,
                 dtdVersion);
+        
         c.toLMF();
         LOG.info("Created lexical resource in memory!");
 
-        File outFile = new File(TARGET_UBY  + WN30_UBY + ".xml");
+        File outFile = new File(TARGET_UBY  + "uby-wn" + versionWithoutDot  + ".xml");
         if (outFile.exists()) {
             outFile.delete();
         }
         lexicalResourceToXml(lr, outFile);
 
-        String outDb = TARGET_UBY + WN30_UBY;
-        xmlToDb(outFile, outDb);
+        return outFile;
+        
+    }
+    
+    @Test
+    public void testCreateDbWn31() throws IOException, JWNLException {
+        
+        File xml = Tests.getDump(DUMPS_UBY  + "uby-wn31.xml");
+        
+        String outDb = TARGET_UBY + "uby-wn31";
+        xmlToDb(xml, outDb);
         checkDb(outDb);
 
     }
 
-    public File getDump(String str) {
-        return getDump(new File(str));
-    }
-
-    /**
-     * Expects a .xml file. If not found, a file .xml.xz
-     * is searched and decompressed in same folder and returned
-     * 
-     */
-    public File getDump(File file) {
-
-        if (file.getAbsolutePath()
-                .endsWith(".xml")
-                || file.getAbsolutePath()
-                       .endsWith(".h2.db")) {
-            if (file.exists()) {
-                return file;
-            } else {
-
-                File xz = new File(file.getAbsolutePath() + ".xz");
-
-                if (!xz.exists()) {
-                    throw new IllegalStateException("Couldn't find file " + xz.getAbsolutePath() + " to decompress!");
-                }
-
-                LOG.info("Decompressing " + xz.getAbsolutePath() + " ...");
-                try {
-                    FileInputStream fin = new FileInputStream(xz);
-                    BufferedInputStream in = new BufferedInputStream(fin);
-                    FileOutputStream out = new FileOutputStream(file);
-                    XZInputStream xzIn = new XZInputStream(in);
-                    final byte[] buffer = new byte[8192];
-                    int n = 0;
-                    while (-1 != (n = xzIn.read(buffer))) {
-                        out.write(buffer, 0, n);
-                    }
-                    out.close();
-                    xzIn.close();
-                    LOG.info("Wrote " + file.getAbsolutePath() + " file.");
-                    return file;
-                } catch (Exception e) {
-                    throw new RuntimeException("Error while decompressing " + file.getAbsolutePath(), e);
-                }
-
-            }
-
-        } else {
-            throw new IllegalArgumentException("Unsupported input file extension for file " + file.getAbsolutePath());
-        }
-
-    }
-
+    
     @Test
-    public void testCreateWn30Xml()
-            throws IOException, JWNLException, XMLStreamException, SAXException, DocumentException {
-        String version = "3.0";
-        File outFile = new File("mywordnet-" + version + ".xml");
-        wordnet2XML("wn30/", outFile, version);
+    public void testCreateWn30Xml() {               
+        wordnet2Xml("3.0");
     }
     
     @Test    
-    public void testCreateWn31Xml()
-            throws IOException, JWNLException, XMLStreamException, SAXException, DocumentException {
-        String version = "3.1";
-        File outFile = new File("mywordnet-"+version+".xml");
-        wordnet2XML("wn31/", outFile, version);
+    public void testCreateWn31Xml() {
+        wordnet2Xml("3.1");
     }
-
-    /**
-     * Copied from ubycreate-gpl
-     * 
-     * @param version i.e. "3.0"
-     */
-    public File wordnet2XML(String source, File lmfXML, String version)
-            throws IOException, XMLStreamException, SAXException, DocumentException, JWNLException {
-        
-
-        /* Dumping lexical into a file */
-
-        LexicalResource lexicalResource = null;
-
-        File wnPath = new File(source);
-        Dictionary extWordnet;
-        extWordnet = Dictionary
-                               .getInstance(IOUtils.toInputStream(
-                                       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                                               + "<jwnl_properties language=\"en\">"
-                                               + "  <version publisher=\"Princeton\" number=\""+version+"\" language=\"en\"/>"
-                                               + "  <dictionary class=\"net.sf.extjwnl.dictionary.FileBackedDictionary\">"
-                                               + "    <param name=\"morphological_processor\" value=\"net.sf.extjwnl.dictionary.morph.DefaultMorphologicalProcessor\">"
-                                               + "      <param name=\"operations\">"
-                                               + "        <param value=\"net.sf.extjwnl.dictionary.morph.LookupExceptionsOperation\"/>"
-                                               + "        <param value=\"net.sf.extjwnl.dictionary.morph.DetachSuffixesOperation\">"
-                                               + "          <param name=\"noun\" value=\"|s=|ses=s|xes=x|zes=z|ches=ch|shes=sh|men=man|ies=y|\"/>"
-                                               + "          <param name=\"verb\" value=\"|s=|ies=y|es=e|es=|ed=e|ed=|ing=e|ing=|\"/>"
-                                               + "          <param name=\"adjective\" value=\"|er=|est=|er=e|est=e|\"/>"
-                                               + "          <param name=\"operations\">"
-                                               + "            <param value=\"net.sf.extjwnl.dictionary.morph.LookupIndexWordOperation\"/>"
-                                               + "            <param value=\"net.sf.extjwnl.dictionary.morph.LookupExceptionsOperation\"/>"
-                                               + "          </param>"
-                                               + "        </param>"
-                                               + "        <param value=\"net.sf.extjwnl.dictionary.morph.TokenizerOperation\">"
-                                               + "          <param name=\"delimiters\">"
-                                               + "            <param value=\" \"/>"
-                                               + "            <param value=\"-\"/>"
-                                               + "          </param>"
-                                               + "          <param name=\"token_operations\">"
-                                               + "            <param value=\"net.sf.extjwnl.dictionary.morph.LookupIndexWordOperation\"/>"
-                                               + "            <param value=\"net.sf.extjwnl.dictionary.morph.LookupExceptionsOperation\"/>"
-                                               + "            <param value=\"net.sf.extjwnl.dictionary.morph.DetachSuffixesOperation\">"
-                                               + "              <param name=\"noun\" value=\"|s=|ses=s|xes=x|zes=z|ches=ch|shes=sh|men=man|ies=y|\"/>"
-                                               + "              <param name=\"verb\" value=\"|s=|ies=y|es=e|es=|ed=e|ed=|ing=e|ing=|\"/>"
-                                               + "              <param name=\"adjective\" value=\"|er=|est=|er=e|est=e|\"/>"
-                                               + "              <param name=\"operations\">"
-                                               + "                <param value=\"net.sf.extjwnl.dictionary.morph.LookupIndexWordOperation\"/>"
-                                               + "                <param value=\"net.sf.extjwnl.dictionary.morph.LookupExceptionsOperation\"/>"
-                                               + "              </param>"
-                                               + "            </param>"
-                                               + "          </param>"
-                                               + "        </param>"
-                                               + "      </param>"
-                                               + "    </param>"
-                                               + "    <param name=\"dictionary_element_factory\" value=\"net.sf.extjwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory\"/>"
-                                               + "    <param name=\"file_manager\" value=\"net.sf.extjwnl.dictionary.file_manager.FileManagerImpl\">"
-                                               + "      <param name=\"file_type\" value=\"net.sf.extjwnl.princeton.file.PrincetonRandomAccessDictionaryFile\"/>"
-                                               + "      <param name=\"dictionary_path\" value=\""
-                                               + wnPath.getAbsolutePath() + "\"/>"
-                                               + "    </param>"
-                                               + "  </dictionary>"
-                                               + "</jwnl_properties>"));
-
-        WNConverter converterWN = new WNConverter(wnPath, extWordnet, new LexicalResource(),
-                "WordNet_" + version + "_eng", dtdVersion);
-        converterWN.toLMF();
-        lexicalResource = converterWN.getLexicalResource();
-
-        return lexicalResourceToXml(lexicalResource, lmfXML);
-
-    }
-    
-    
+      
 
     private File lexicalResourceToXml(LexicalResource lexicalResource, File lmfXML) {
         try {
@@ -263,7 +148,7 @@ public class DivMakerUbyTest {
 
     @Test
     public void testXmlDumpToDb() {
-        File xmlDump = getDump(DUMPS_UBY + WN30_UBY + ".xml");
+        File xmlDump = Tests.getDump(DUMPS_UBY + WN30_UBY + ".xml");
         String outDb = TARGET_UBY + WN30_UBY + "-from-dump";
         xmlToDb(xmlDump, outDb);
 

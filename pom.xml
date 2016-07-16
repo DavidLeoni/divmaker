@@ -212,6 +212,12 @@
 		    <artifactId>extjwnl-data-wn30</artifactId>
 		    <version>1.2</version>
 		</dependency>
+
+		<dependency>
+		    <groupId>net.sf.extjwnl</groupId>
+		    <artifactId>extjwnl-data-wn31</artifactId>
+		    <version>1.2</version>
+		</dependency>
         
 		<dependency>
 			<groupId>org.hibernate.common</groupId>
@@ -257,9 +263,8 @@
 
       <dependency>
         <groupId>net.sf.extjwnl</groupId>
-        <artifactId>extjwnl</artifactId>
-        <!--  IF commented, allows DivMakerUbyTest.testCreateWn30Xml to run !! -->
-        <!--   <version>1.9.1</version> -->
+        <artifactId>extjwnl</artifactId>        
+        <version>1.9.1</version> 
         <exclusions>
 			<exclusion>			
 			    <groupId>org.slf4j</groupId>

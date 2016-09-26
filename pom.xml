@@ -197,10 +197,11 @@
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.uby</groupId>	
 			<artifactId>de.tudarmstadt.ukp.uby.integration.wordnet-gpl</artifactId>
+			<version>0.7.0-div</version>
 			<exclusions>
 				<exclusion>
-				    <groupId>net.sf.extjwnl</groupId>
-        			<artifactId>extjwnl</artifactId>				    
+					<groupId>net.sf.extjwnl</groupId>
+					<artifactId>extjwnl</artifactId>
 				</exclusion>
 			</exclusions>
 			
@@ -246,8 +247,6 @@
 			<type>jar</type>
 <!-- 			<scope>compile</scope>  -->
 		</dependency>
- 
-
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

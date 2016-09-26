@@ -28,6 +28,7 @@ import org.dom4j.DocumentException;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,9 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
 
 /**
+ * 
+ * TODO this class is full of useless stuff, do clean up!
+ * 
  * @since 0.1.0
  */
 public class DivMakerUbyTest {
@@ -88,7 +92,9 @@ public class DivMakerUbyTest {
 
         LexicalResource lr = new LexicalResource();
 
-        WNConverter c = new WNConverter(new File("wn" + versionWithoutDot + "/"),
+        WNConverter c = new WNConverter(
+                "wn"+versionWithoutDot,
+                new File("wn" + versionWithoutDot + "/"),
                 dictionary,
                 lr,
                 version,
@@ -108,6 +114,7 @@ public class DivMakerUbyTest {
     }
     
     @Test
+    @Ignore
     public void testCreateDbWn31() throws IOException, JWNLException {
         
         File xml = Tests.getDump(DUMPS_UBY  + "uby-wn31.xml");
@@ -120,11 +127,13 @@ public class DivMakerUbyTest {
 
     
     @Test
+    @Ignore
     public void testCreateWn30Xml() {               
         wordnet2Xml("3.0");
     }
     
-    @Test    
+    @Test  
+    @Ignore
     public void testCreateWn31Xml() {
         wordnet2Xml("3.1");
     }
@@ -147,6 +156,7 @@ public class DivMakerUbyTest {
     }
 
     @Test
+    @Ignore
     public void testXmlDumpToDb() {
         File xmlDump = Tests.getDump(DUMPS_UBY + WN30_UBY + ".xml");
         String outDb = TARGET_UBY + WN30_UBY + "-from-dump";
@@ -156,11 +166,13 @@ public class DivMakerUbyTest {
     }
 
     @Test
+    @Ignore
     public void testDbToSql() {
         dbToSql(getDefaultH2FileDbConfig(DUMPS_UBY + WN30_UBY ), TARGET_UBY + WN30_UBY);
     }
 
     @Test
+    @Ignore
     public void testRestoreFileDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         restoreH2Db(DUMPS_UBY + WN30_UBY + ".zip", 
@@ -168,12 +180,14 @@ public class DivMakerUbyTest {
     }
 
     @Test
+    @Ignore
     public void testRestoreZipToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         restoreH2Db(DUMPS_UBY + WN30_UBY + ".zip", getDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db"));
     }
     
     @Test
+    @Ignore
     public void testRestoreSqlToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         restoreH2Db(DUMPS_UBY + WN30_UBY + ".sql", getDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db"));

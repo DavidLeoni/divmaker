@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,9 @@ import it.unitn.disi.diversicon.Diversicon;
 import it.unitn.disi.diversicon.Diversicons;
 
 /**
+ * 
+ * TODO this class is full of useless stuff, do clean up!
+ * 
  * @since 0.1.0
  */
 public class DivMakerTest {
@@ -65,6 +69,7 @@ public class DivMakerTest {
     }
 
     @Test
+    @Ignore
     public void testXmlDumpToDb() {
         File xmlDump = Tests.getDump(DUMPS_DIVERSICON + WN30_DIV + ".xml");
         String outDb = TARGET_DIV + "wn30-from-dump";
@@ -74,6 +79,7 @@ public class DivMakerTest {
     }
 
     @Test
+    @Ignore
     public void testDbToSql() {
         DBConfig dbConfig = Diversicons.makeDefaultH2InMemoryDbConfig("mydb", false);
         Diversicons.dropCreateTables(dbConfig);
@@ -86,6 +92,7 @@ public class DivMakerTest {
     }
 
     @Test
+    @Ignore
     public void testRestoreFileDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".zip",
@@ -93,6 +100,7 @@ public class DivMakerTest {
     }
 
     @Test
+    @Ignore
     public void testRestoreZipToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".zip", 
@@ -100,6 +108,7 @@ public class DivMakerTest {
     }
     
     @Test
+    @Ignore
     public void testRestoreSqlToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".sql", 

@@ -26,13 +26,6 @@
 	</scm>
 
 
-	<properties>
-		<dkpro.uby.version>0.7.0</dkpro.uby.version>
-		<slf4j.version>1.7.21</slf4j.version> <!-- so we get org.slf4j.event.Level -->
-		<diversicon.version>0.1.0-SNAPSHOT</diversicon.version>
-	</properties>
-
-
 	<repositories>
 		<!-- so it picks superpom snapshot without complaining -->
 		<repository>
@@ -128,24 +121,29 @@
 				<configuration>
 					<programs>
 						<program>
-							<mainClass>it.unitn.disi.DiverCli</mainClass>
-							<id>divercli</id>
+							<mainClass>it.unitn.disi.diversicon.maker.DivMaker</mainClass>
+							<id>divmaker</id>
 						</program>
 					</programs>
 				</configuration>
 			</plugin>
+
+        
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <mainClass>it.unitn.disi.diversicon.maker.DivMaker</mainClass>
+                </configuration>
+            </plugin>
 
 		</plugins>
 	</build>
 
 	<dependencies>
 	
-	<dependency>
-		    <groupId>com.github.lalyos</groupId>
-		    <artifactId>jfiglet</artifactId>
-		    <version>0.0.7</version>
-		</dependency>
-
+	
 		 <dependency>
 			<groupId>it.unitn.disi</groupId>
 			<artifactId>diversicon</artifactId>
@@ -156,6 +154,12 @@
 			<artifactId>div-wn31-model</artifactId>		
 		</dependency>
 
+	
+		<dependency>
+		    <groupId>com.github.lalyos</groupId>
+		    <artifactId>jfiglet</artifactId>
+		    <version>0.0.7</version>
+		</dependency>
 
 		<dependency>
 		  <groupId>com.beust</groupId>
@@ -168,6 +172,7 @@
 		    <artifactId>ini4j</artifactId>
 		    <version>0.5.1</version>
 		</dependency>
+
 
 
 		<dependency>
@@ -239,8 +244,7 @@
 
 		<dependency>
 			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			  
+			<artifactId>h2</artifactId>			  
 			<type>jar</type>
 <!-- 			<scope>compile</scope>  -->
 		</dependency>

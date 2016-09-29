@@ -143,10 +143,13 @@ public class DivMaker {
         }
                               
         LOG.info("****  Going to directly create XML to " + xmlDirectFile.getAbsolutePath());
+        LOG.info("****                   (make take several minutes...)");
         
         Diversicons.writeLexResToXml(lexRes, pack, xmlDirectFile);
         
         DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(h2dbName, false);
+        
+        Diversicons.createTables(dbConfig);
         
         Diversicon div = Diversicon.connectToDb(dbConfig);
         div.importResource(lexRes, pack, false); 

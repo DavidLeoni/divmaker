@@ -35,14 +35,16 @@ public class DivMaker {
 
     private static final String dtdPath = "ubyLmfDTD_1.0.dtd";
     private static final String dtdVersion = "1_0";
-
+          
+    /**
+     * @since 0.1.0
+     */
     private static final String DUMPS_UBY = "dumps/uby/";
     
-    private static final String WN30_UBY = "uby-wn30";
-
-    private static final String TARGET_UBY = "target/uby/";
-    
-    private static final String TARGET_DIV = "target/diversicon/";
+    /**
+     * @since 0.1.0
+     */    
+    private static final String DUMPS_DIV = "dumps/diversicon/";
     
     /**
      * version with dots, like '3.1'
@@ -99,31 +101,31 @@ public class DivMaker {
         this.lexRes = wordnetToLexRes();
         this.lexRes.setName(DivWn31.NAME);
         
-        String h2dbName = TARGET_DIV + lexRes.getName();        
+        String h2dbName = DUMPS_DIV + lexRes.getName();        
         
-        File xmlDirectFile = new File(TARGET_DIV + lexRes.getName() + "-direct.lmf.xml");
+        File xmlDirectFile = new File(DUMPS_DIV + lexRes.getName() + "-direct.xml");
         if (xmlDirectFile.exists()) {
             xmlDirectFile.delete();
         }
         
-        File xmlFile = new File(TARGET_DIV + lexRes.getName() + ".lmf.xml");
+        File xmlFile = new File(DUMPS_DIV + lexRes.getName() + ".xml");
         if (xmlFile.exists()) {
             xmlFile.delete();
         }
         
-        File sqlFile = new File(TARGET_DIV + lexRes.getName() + ".sql");
+        File sqlFile = new File(DUMPS_DIV + lexRes.getName() + ".sql");
         if (sqlFile.exists()) {
             sqlFile.delete();
         }
 
-        File h2dbFile = new File(h2dbName + ".h2.db");
+        File h2dbFile = new File(DUMPS_DIV + h2dbName + ".h2.db");
         if (h2dbFile.exists()) {
             h2dbFile.delete();
         }
                               
-        LOG.info("****  Going to directly create XML to " + h2dbFile.getAbsolutePath());
+        LOG.info("****  Going to directly create XML to " + xmlDirectFile.getAbsolutePath());
         
-        Diversicons.writeLexResToXml(lexRes, pack, h2dbFile);
+        Diversicons.writeLexResToXml(lexRes, pack, xmlDirectFile);
         
         DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(h2dbName, false);
         

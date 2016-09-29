@@ -97,9 +97,18 @@ public class DivMaker {
      * @since 0.1.0
      */
     private void run() {
+
+        LOG.info("");
+        LOG.info("");
+        LOG.info("****   Going to create:\n" + pack.toString());
+        LOG.info("");
+        LOG.info("");
+        Internals.checkLexResPackage(pack);        
         
         this.lexRes = wordnetToLexRes();
         this.lexRes.setName(DivWn31.NAME);
+        
+
         
         String h2dbName = DUMPS_DIV + lexRes.getName();        
         

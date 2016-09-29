@@ -8,19 +8,16 @@ GPL licensed.
 
 Note to myself:
 
-Worked on opendata server to create `target/uby-wn30.xml` and `target/uby-wn31.xml` by issuing:
+Worked on opendata server to create `diversicon/div-wn31.xml` issuing:
 
 ```
-
-MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn -Dtest=DivMakerUbyTest#testCreateWn31Xml test
-MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn -Dtest=DivMakerUbyTest#testCreateWn31Xml test
-
+MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn  exec:java
 
 ```
 
 To execute a single test:
 
 ```
-MAVEN_OPTS="-Xmx1024M -Xss128M -XX:MaxPermSize=124M -XX:+CMSClassUnloadingEnabled" mvn  -Dtest=DivUtilsIT#testRetestRestoreNonAugmentedNonResourceUbyWordnetH2Sql
+MAVEN_OPTS="-Xmx1024M -Xss128M -XX:MaxPermSize=124M -XX:+CMSClassUnloadingEnabled" mvn  -Dtest=DivUtilsIT#test
 ```
 

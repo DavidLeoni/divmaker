@@ -112,10 +112,20 @@ public class DivMaker {
         
         String h2dbName = DUMPS_DIV + lexRes.getName();        
         
+        File fDumps = new File(DUMPS_DIV);
+        
+        if (!fDumps.exists()){
+            LOG.info("Creating " + fDumps + "   ...");
+            if (!fDumps.mkdirs()){
+                throw new DivException("Couldn't create directory " + fDumps);
+            }
+            
+        }
+        
         File xmlDirectFile = new File(DUMPS_DIV + lexRes.getName() + "-direct.xml");
         if (xmlDirectFile.exists()) {
             xmlDirectFile.delete();
-        }
+        } 
         
         File xmlFile = new File(DUMPS_DIV + lexRes.getName() + ".xml");
         if (xmlFile.exists()) {

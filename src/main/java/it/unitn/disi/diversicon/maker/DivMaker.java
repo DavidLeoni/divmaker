@@ -19,6 +19,7 @@ import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
 import it.disi.unitn.diversicon.exceptions.DivException;
 import it.unitn.disi.diversicon.Diversicon;
 import it.unitn.disi.diversicon.Diversicons;
+import it.unitn.disi.diversicon.ImportConfig;
 import it.unitn.disi.diversicon.LexResPackage;
 import it.unitn.disi.diversicon.internal.Internals;
 import net.sf.extjwnl.JWNLException;
@@ -121,11 +122,7 @@ public class DivMaker {
             }
             
         }
-        
-        File xmlDirectFile = new File(DUMPS_DIV + lexRes.getName() + "-direct.xml");
-        if (xmlDirectFile.exists()) {
-            xmlDirectFile.delete();
-        } 
+                
         
         File xmlFile = new File(DUMPS_DIV + lexRes.getName() + ".xml");
         if (xmlFile.exists()) {
@@ -142,26 +139,23 @@ public class DivMaker {
             h2dbFile.delete();
         }
                               
-        LOG.info("****  Going to directly create XML to " + xmlDirectFile.getAbsolutePath());
+        LOG.info("****  Going to create XML to " + xmlFile.getAbsolutePath());
         LOG.info("****                   (make take several minutes...)");
         
-        Diversicons.writeLexResToXml(lexRes, pack, xmlDirectFile);
+        Diversicons.writeLexResToXml(lexRes, pack, xmlFile);
         
         DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(h2dbName, false);
         
         Diversicons.createTables(dbConfig);
         
         Diversicon div = Diversicon.connectToDb(dbConfig);
-        div.importResource(lexRes, pack, false); 
+        ImportConfig config = new ImportConfig();
+        config.setAuthor("David Leoni");
+        config.setDescription("Import for making Wordnet 3.1 Diversicon distribution");
+        config.setFileUrls(Internals.newArrayList(xmlFile.getAbsolutePath()));
         
-        LOG.info("****  Recreating XML to " + xmlFile.getAbsolutePath());
+        div.importFiles(config); 
         
-        try {
-            div.exportToXml(xmlFile.getAbsolutePath(), lexRes.getName(), false);
-        } catch (Exception ex){
-            error("FAILED EXPORTING TO XML!", ex);
-        }
-
         try {
             LOG.info("****  Exporting to SQL " + sqlFile.getAbsolutePath());
             div.exportToSql(sqlFile.getAbsolutePath(), false);

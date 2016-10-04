@@ -2,6 +2,8 @@ package it.unitn.disi.diversicon.maker;
 
 import static it.unitn.disi.diversicon.internal.Internals.checkNotBlank;
 import it.unitn.disi.diversicon.data.DivWn31;
+import it.unitn.disi.diversicon.exceptions.DivException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +18,6 @@ import de.tudarmstadt.ukp.lmf.model.meta.MetaData;
 import de.tudarmstadt.ukp.lmf.transform.DBConfig;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
 import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
-import it.disi.unitn.diversicon.exceptions.DivException;
 import it.unitn.disi.diversicon.Diversicon;
 import it.unitn.disi.diversicon.Diversicons;
 import it.unitn.disi.diversicon.ImportConfig;
@@ -34,8 +35,8 @@ public class DivMaker {
 
     private static final Logger LOG = LoggerFactory.getLogger(DivMaker.class);
 
-    private static final String dtdPath = "ubyLmfDTD_1.0.dtd";
-    private static final String dtdVersion = "1_0";
+    private static final String dtdPath = Diversicons.DTD_1_0_PUBLIC_URL;
+    private static final String dtdVersion = "1.0";
           
     /**
      * @since 0.1.0
@@ -106,8 +107,7 @@ public class DivMaker {
         LOG.info("");
         Internals.checkLexResPackage(pack);        
         
-        this.lexRes = wordnetToLexRes();
-        this.lexRes.setName(DivWn31.NAME);
+        this.lexRes = wordnetToLexRes();        
         
 
         
@@ -226,6 +226,9 @@ public class DivMaker {
 
         LexicalResource lexRes = new LexicalResource();
 
+        lexRes.setName(DivWn31.NAME);        
+        lexRes.setDtdVersion(dtdVersion);
+        
         WNConverter c = new WNConverter(
                 "wn"+vNoDot(),
                 wordnetOnDisk,

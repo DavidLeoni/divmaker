@@ -1,7 +1,6 @@
 
 nohup.out
-/dumps/uby/*
-/dumps/diversicon/*
+/dumps
 
 
 ##### MAVEN

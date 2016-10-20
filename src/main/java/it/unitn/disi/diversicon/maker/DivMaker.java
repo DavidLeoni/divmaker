@@ -144,7 +144,7 @@ public class DivMaker {
         
         Diversicons.writeLexResToXml(lexRes, pack, xmlFile);
         
-        DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(h2dbName, false);
+        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(h2dbName, false);
         
         Diversicons.createTables(dbConfig);
         
@@ -164,15 +164,17 @@ public class DivMaker {
         }
 
         try {
-        LOG.info("****  Compacting db");
-        SQLQuery q = div.getSession().createSQLQuery("SHUTDOWN COMPACT");
-        q.executeUpdate();
-        LOG.info("****  Done compacting db.");
+            LOG.info("****  Compacting db");
+            Diversicons.h2Execute("SHUTDOWN COMPACT", dbConfig);
+            LOG.info("****  Done compacting db.");
         } catch (Exception ex){
             error("FAILED COMPACTING THE DB!", ex);
         }
+
+        if (!div.getSession().isOpen()){
+            div.getSession().close();    
+        }
         
-        div.getSession().close();
         
         if (errors.size() > 0){
             LOG.error("");        

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -81,7 +83,7 @@ public class DivMakerTest {
     @Test
     @Ignore
     public void testDbToSql() {
-        DBConfig dbConfig = Diversicons.makeDefaultH2InMemoryDbConfig("mydb", false);
+        DBConfig dbConfig = Diversicons.h2MakeDefaultInMemoryDbConfig("mydb", false);
         Diversicons.dropCreateTables(dbConfig);
         Diversicon div = Diversicon.connectToDb(dbConfig);
         div.importXml("dumps/uby/uby-wn30.xml.xz");
@@ -91,28 +93,41 @@ public class DivMakerTest {
         div.getSession().close();
     }
 
+    
+    @Test    
+    @Ignore
+    public void testConnectToDb() {
+        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig("~/Da/prj/diversicon/dumps/div-wn31", true);
+        Diversicon div = Diversicon.connectToDb(dbConfig);
+                
+        div.getSession().close();
+        
+        Diversicons.h2Execute("SHUTDOWN COMPACT", dbConfig);
+    }
+    
+    
     @Test
     @Ignore
     public void testRestoreFileDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
-        Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".zip",
-                    Diversicons.makeDefaultH2FileDbConfig(tempDir.toString() + "/temp-db", true));
+        Diversicons.h2RestoreSql(DUMPS_DIVERSICON + WN30_DIV + ".zip",
+                    Diversicons.h2MakeDefaultFileDbConfig(tempDir.toString() + "/temp-db", true));
     }
 
     @Test
     @Ignore
     public void testRestoreZipToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
-        Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".zip", 
-                Diversicons.makeDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db", false));
+        Diversicons.h2RestoreSql(DUMPS_DIVERSICON + WN30_DIV + ".zip", 
+                Diversicons.h2MakeDefaultInMemoryDbConfig(tempDir.toString() + "/temp-db", false));
     }
     
     @Test
     @Ignore
     public void testRestoreSqlToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
-        Diversicons.restoreH2Sql(DUMPS_DIVERSICON + WN30_DIV + ".sql", 
-                Diversicons.makeDefaultH2InMemoryDbConfig(tempDir.toString() + "/temp-db", false));
+        Diversicons.h2RestoreSql(DUMPS_DIVERSICON + WN30_DIV + ".sql", 
+                Diversicons.h2MakeDefaultInMemoryDbConfig(tempDir.toString() + "/temp-db", false));
     }
 
    
@@ -131,7 +146,7 @@ public class DivMakerTest {
 
             LOG.info("Going to populate H2 DB " + outDb + "...");
 
-            DBConfig dbConfig = Diversicons.makeDefaultH2FileDbConfig(outDb, false);
+            DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(outDb, false);
 
             Diversicons.dropCreateTables(dbConfig);
 

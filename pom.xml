@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>it.unitn.disi</groupId>
+		<groupId>eu.kidf</groupId>
 		<artifactId>diversicon-super-pom</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
@@ -14,7 +14,7 @@
 	<packaging>jar</packaging>
 
 	<name>DivMaker</name>
-	<url>https://github.com/DavidLeoni/divercli</url>
+	<url>https://github.com/diversicon-kb/divercli</url>
 	<description>Quick and dirty interface to generate LMF XMLs .</description>
 
 	<!-- better to copy scm, see https://github.com/opendatatrentino/tod-super-pom/issues/1 -->
@@ -121,7 +121,7 @@
 				<configuration>
 					<programs>
 						<program>
-							<mainClass>it.unitn.disi.diversicon.maker.DivMaker</mainClass>
+							<mainClass>eu.kidf.diversicon.maker.DivMaker</mainClass>
 							<id>divmaker</id>
 						</program>
 					</programs>
@@ -134,7 +134,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <mainClass>it.unitn.disi.diversicon.maker.DivMaker</mainClass>
+                    <mainClass>eu.kidf.diversicon.maker.DivMaker</mainClass>
                 </configuration>
             </plugin>
 
@@ -145,12 +145,12 @@
 	
 	
 		 <dependency>
-			<groupId>it.unitn.disi</groupId>
-			<artifactId>diversicon</artifactId>
+			<groupId>eu.kidf</groupId>
+			<artifactId>diversicon-core</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>it.unitn.disi</groupId>
+			<groupId>eu.kidf</groupId>
 			<artifactId>div-wn31-model</artifactId>		
 		</dependency>
 
@@ -290,7 +290,7 @@
 		</dependency>
 
 		<!--  <dependency>
-			<groupId>it.unitn.disi</groupId>
+			<groupId>eu.kidf</groupId>
 			<artifactId>diversicon</artifactId>
 			<type>test-jar</type>
 			<version>${diversicon.version}</version>

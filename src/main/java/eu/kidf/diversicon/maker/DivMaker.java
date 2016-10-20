@@ -1,8 +1,6 @@
-package it.unitn.disi.diversicon.maker;
+package eu.kidf.diversicon.maker;
 
-import static it.unitn.disi.diversicon.internal.Internals.checkNotBlank;
-import it.unitn.disi.diversicon.data.DivWn31;
-import it.unitn.disi.diversicon.exceptions.DivException;
+import static eu.kidf.diversicon.core.internal.Internals.checkNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,11 +16,13 @@ import de.tudarmstadt.ukp.lmf.model.meta.MetaData;
 import de.tudarmstadt.ukp.lmf.transform.DBConfig;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
 import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
-import it.unitn.disi.diversicon.Diversicon;
-import it.unitn.disi.diversicon.Diversicons;
-import it.unitn.disi.diversicon.ImportConfig;
-import it.unitn.disi.diversicon.LexResPackage;
-import it.unitn.disi.diversicon.internal.Internals;
+import eu.kidf.diversicon.core.Diversicon;
+import eu.kidf.diversicon.core.Diversicons;
+import eu.kidf.diversicon.core.ImportConfig;
+import eu.kidf.diversicon.core.LexResPackage;
+import eu.kidf.diversicon.core.exceptions.DivException;
+import eu.kidf.diversicon.core.internal.Internals;
+import eu.kidf.diversicon.data.DivWn31;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
 

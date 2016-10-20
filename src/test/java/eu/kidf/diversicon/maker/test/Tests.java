@@ -1,4 +1,4 @@
-package it.unitn.disi.diversicon.maker.test;
+package eu.kidf.diversicon.maker.test;
 
 import java.io.BufferedInputStream;
 import java.io.File;

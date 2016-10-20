@@ -1,6 +1,6 @@
-package it.unitn.disi.diversicon.maker.test;
+package eu.kidf.diversicon.maker.test;
 
-import static it.unitn.disi.diversicon.internal.Internals.checkNotBlank;
+import static eu.kidf.diversicon.core.internal.Internals.checkNotBlank;
 import static org.junit.Assert.assertTrue;
 
 import java.io.EOFException;

@@ -1,4 +1,4 @@
-package it.unitn.disi.diversicon.maker.test;
+package eu.kidf.diversicon.maker.test;
 
 import static org.junit.Assert.assertTrue;
 
@@ -18,8 +18,8 @@ import de.tudarmstadt.ukp.lmf.model.core.LexicalResource;
 import de.tudarmstadt.ukp.lmf.transform.DBConfig;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
 import de.tudarmstadt.ukp.lmf.transform.XMLToDBTransformer;
-import it.unitn.disi.diversicon.Diversicon;
-import it.unitn.disi.diversicon.Diversicons;
+import eu.kidf.diversicon.core.Diversicon;
+import eu.kidf.diversicon.core.Diversicons;
 
 /**
  * 

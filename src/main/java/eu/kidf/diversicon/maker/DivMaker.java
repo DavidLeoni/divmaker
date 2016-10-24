@@ -116,8 +116,7 @@ public class DivMaker {
         Internals.checkLexResPackage(pack);
 
         this.lexRes = wordnetToLexRes();
-
-        String h2dbName = lexRes.getName();
+        
 
         File fDumps = new File(DUMPS_DIV);
 
@@ -139,7 +138,7 @@ public class DivMaker {
             sqlFile.delete();
         }
 
-        File h2dbFile = new File(DUMPS_DIV + h2dbName + ".h2.db");
+        File h2dbFile = new File(DUMPS_DIV + lexRes.getName() + ".h2.db");
         if (h2dbFile.exists()) {
             h2dbFile.delete();
         }
@@ -158,7 +157,7 @@ public class DivMaker {
 
 
         
-        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(h2dbName, false);
+        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(DUMPS_DIV + lexRes.getName(), false);
 
         Diversicons.createTables(dbConfig);
 

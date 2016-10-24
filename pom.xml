@@ -202,7 +202,7 @@
 		<dependency>
 			<groupId>de.tudarmstadt.ukp.uby</groupId>	
 			<artifactId>de.tudarmstadt.ukp.uby.integration.wordnet-gpl</artifactId>
-			<version>0.7.0-div</version>
+			<version>0.7.0-div-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>net.sf.extjwnl</groupId>

@@ -117,7 +117,7 @@ public class DivMaker {
 
         this.lexRes = wordnetToLexRes();
 
-        String h2dbName = DUMPS_DIV + lexRes.getName();
+        String h2dbName = lexRes.getName();
 
         File fDumps = new File(DUMPS_DIV);
 

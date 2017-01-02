@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.hibernate.SQLQuery;
@@ -23,6 +25,7 @@ import de.tudarmstadt.ukp.lmf.model.meta.MetaData;
 import de.tudarmstadt.ukp.lmf.transform.DBConfig;
 import de.tudarmstadt.ukp.lmf.transform.LMFXmlWriter;
 import de.tudarmstadt.ukp.lmf.transform.wordnet.WNConverter;
+import eu.kidf.diversicon.core.DivConfig;
 import eu.kidf.diversicon.core.Diversicon;
 import eu.kidf.diversicon.core.Diversicons;
 import eu.kidf.diversicon.core.ImportConfig;
@@ -149,19 +152,13 @@ public class DivMaker {
         Diversicons.writeLexResToXml(lexRes, pack, xmlFile);
         LOG.info("****  Done creating " + xmlFile.getAbsolutePath());
         
-        try {
-            compressXz(xmlFile);
-        } catch (Exception ex){
-            error("FAILED COMPRESSING XML!", ex);
-        }
-
-
+        compress(xmlFile);        
         
         DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(DUMPS_DIV + lexRes.getName(), false);
 
         Diversicons.createTables(dbConfig);
 
-        Diversicon div = Diversicon.connectToDb(dbConfig);
+        Diversicon div = Diversicon.connectToDb(DivConfig.of(dbConfig));
         ImportConfig config = new ImportConfig();
         config.setAuthor("David Leoni");
         config.setDescription("Import for making Wordnet 3.1 Diversicon distribution");
@@ -171,12 +168,9 @@ public class DivMaker {
 
         try {
             LOG.info("****  Exporting to SQL " + sqlFile.getAbsolutePath());            
-            div.exportToSql(sqlFile.getAbsolutePath(), false);            
-            try {
-                compressXz(sqlFile);
-            } catch (Exception ex){
-                error("FAILED COMPRESSING SQL!", ex);
-            }
+            div.exportToSql(sqlFile.getAbsolutePath(), false);
+            compress(sqlFile);
+            
         } catch (Exception ex) {
             error("FAILED EXPORTING TO SQL!", ex);
         }
@@ -191,11 +185,8 @@ public class DivMaker {
                 div.getSession()
                    .close();
             }
-            try {
-                compressXz(h2dbFile);
-            } catch (Exception ex){
-                error("FAILED COMPRESSING THE DB!", ex);
-            }
+
+            compress(h2dbFile);
         } catch (Exception ex) {
             error("FAILED COMPACTING THE DB!", ex);
         }
@@ -270,6 +261,33 @@ public class DivMaker {
         return lexRes;
 
     }
+    
+    /**
+     * This function <b>NEVER</b> throws
+     * @since 0.1.0
+     */
+    private void compress(File src){
+        
+        String path;
+        if (src == null){
+            error("FOUND NULL PATH FOR COMPRESSING !", new Exception(""));
+            return;
+        } else {
+            path = src.getAbsolutePath();
+        }
+        
+        try {            
+            compressXz(src);
+        } catch (Exception ex){
+            error("FAILED COMPRESSING " + path, ex);
+        }
+        
+        try {            
+            compressZip(src);
+        } catch (Exception ex){
+            error("FAILED COMPRESSING " + path, ex);
+        }
+    }
 
     /**
      * Creates {@code src.xz} file in same {@code src} directory
@@ -306,6 +324,45 @@ public class DivMaker {
             throw new RuntimeException(e);        
         }
 
+    }
+
+    /**
+     * Creates {@code src.zip} file in same {@code src} directory
+     * 
+     * @since 0.1.0
+     */    
+    public void compressZip(File src){
+        Internals.checkNotNull(src);
+        
+        String dst = src.getAbsolutePath() +  ".zip";
+        
+        LOG.info("");
+        LOG.info("**** Creating " + src.getAbsolutePath() + ".zip   ....");
+        
+        try {
+                        
+            StringBuilder sb = new StringBuilder();
+            sb.append("Test String");
+            
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(dst));
+            ZipEntry e = new ZipEntry(src.getAbsolutePath());
+            out.putNextEntry(e);
+
+            byte[] data = sb.toString().getBytes();
+            out.write(data, 0, data.length);
+            out.closeEntry();
+
+            out.close();            
+            
+            FileOutputStream outfile = new FileOutputStream(dst);
+
+            LOG.info("**** Created " + src.getAbsolutePath() + ".xz");
+            
+        } catch (IOException e) {
+            throw new RuntimeException(e);        
+        }
+        
+        
     }
 
 }

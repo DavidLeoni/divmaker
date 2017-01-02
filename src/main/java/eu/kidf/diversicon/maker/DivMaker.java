@@ -279,13 +279,13 @@ public class DivMaker {
         try {            
             compressXz(src);
         } catch (Exception ex){
-            error("FAILED COMPRESSING " + path, ex);
+            error("FAILED COMPRESSING XZ OF " + path, ex);
         }
         
         try {            
             compressZip(src);
         } catch (Exception ex){
-            error("FAILED COMPRESSING " + path, ex);
+            error("FAILED COMPRESSING ZIP OF " + path, ex);
         }
     }
 

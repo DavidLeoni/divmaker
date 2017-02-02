@@ -344,17 +344,20 @@ public class DivMaker {
             StringBuilder sb = new StringBuilder();
             sb.append("Test String");
             
-            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(dst));
-            ZipEntry e = new ZipEntry(src.getAbsolutePath());
-            out.putNextEntry(e);
-
-            byte[] data = sb.toString().getBytes();
-            out.write(data, 0, data.length);
-            out.closeEntry();
-
-            out.close();            
+            ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dst));
+            ZipEntry e = new ZipEntry(src.getName());
+            zos.putNextEntry(e);
             
-            FileOutputStream outfile = new FileOutputStream(dst);
+            FileInputStream in = new FileInputStream(src);
+            
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) > 0) {
+                zos.write(buffer, 0, len);
+            }
+           
+            zos.closeEntry();
+            zos.close();                                   
 
             LOG.info("**** Created " + src.getAbsolutePath() + ".xz");
             

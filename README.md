@@ -11,7 +11,7 @@ Note to myself:
 Worked on opendata server to create `diversicon/div-wn31.xml` issuing:
 
 ```
-MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn  exec:java
+MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn clean install -U  exec:java
 
 ```
 

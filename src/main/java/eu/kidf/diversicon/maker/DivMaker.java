@@ -154,7 +154,7 @@ public class DivMaker {
         
         compress(xmlFile);        
         
-        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(DUMPS_DIV + lexRes.getName(), false);
+        DBConfig dbConfig = Diversicons.h2FileConfig(DUMPS_DIV + lexRes.getName(), false);
 
         Diversicons.createTables(dbConfig);
 

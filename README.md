@@ -3,28 +3,27 @@
 <br/>
 </p>
 
-# DIVMAKER
+#### About DivMaker
 
 
-Quick and dirty Java command line app to generate lexicons.
+Quick and dirty Java command line app to generate lexicons. It is part of <a href="https://github.com/diversicon-kb/diversicon-core" target="_blank">Diversicon project</a>
 
-GPL licensed. 
+|**Usage**|**License**|**Roadmap**|**Contributing**|
+|-----------|---------|-----------|----------------|
+| See [docs](docs) |[GPL](LICENSE.txt) | See [project milestones](../../milestones) | See [wiki](../../wiki)|
 
 
-Note to myself:
+**Features**
 
-Worked on opendata server to create `diversicon/div-wn31.xml` issuing:
+- performs basic conversion from Princeton Wordnet 3.1 to LMF XML format
+- improves Wordnet id generation
+- adds WordForms for lemma variations in WordNet 
 
-```
-MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn clean install -U  exec:java
 
-```
+#### Dependencies
 
-To execute a single test:
+Works with a modified DKPRO UBY 0.7.0, using wordnet component at 0.7.0-div-SNAPSHOT in the branch `develop-div`: https://github.com/diversicon-kb/dkpro-uby/blob/develop-div/de.tudarmstadt.ukp.uby.integration.wordnet-gpl
 
-```
-MAVEN_OPTS="-Xmx1024M -Xss128M -XX:MaxPermSize=124M -XX:+CMSClassUnloadingEnabled" mvn  -Dtest=DivUtilsIT#test
-```
 
 #### Credits
 

@@ -1,9 +1,10 @@
 <p class="josman-to-strip">
 WARNING: WORK IN PROGRESS - THIS IS ONLY A TEMPLATE FOR THE DOCUMENTATION. <br/>
-RELEASE DOCS ARE ON THE <a href="http://davidleoni.github.io/diversicon/" target="_blank">PROJECT WEBSITE</a>
+RELEASE DOCS ARE ON THE <a href="http://diversicon-kb.eu/manual/divmaker" target="_blank">PROJECT WEBSITE</a>
 </p>
 
-This release allows to TODO. <!--If you are upgrading from previous version, see [Release notes](CHANGES.md).-->
+This release allows to convert Princeton Wordnet 3.1 to LMF XML. With some minor tweak in the code, in theory you could convert to LMF also other databases in Princeton Wordnet format.  
+<!--If you are upgrading from previous version, see [Release notes](CHANGES.md).-->
 
 ### Getting started
 
@@ -13,12 +14,29 @@ This release allows to TODO. <!--If you are upgrading from previous version, see
     <dependency>
         <groupId>eu.kidf</groupId>
         <artifactId>divmaker</artifactId>
-        <version>#{version}</version>
+        <version>${project.version}</version>
     </dependency>
 ```
 
-**Without Maven**: you can download DivMaker jar and its dependencies <a href="../releases/download/diversicon-#{version}/diversicon-#{version}.zip" target="_blank"> from here</a>, then copy the jars to your project classpath.
+**Without Maven**: you can download DivMaker jar and its dependencies <a href="../releases/download/divmaker-#{version}/divmaker-${project.version}.zip" target="_blank"> from here</a>, then copy the jars to your project classpath.
 
 
 In case updates are available, version numbers follow <a href="http://semver.org/" target="_blank">semantic versioning</a> rules.
 
+
+### Create Wordnet 3.1
+
+Worked on opendata server to create `dumps/diversicon/div-wn31.xml` issuing:
+
+```bash
+MAVEN_OPTS="-Xms1g -Xmx3g -XX:-UseGCOverheadLimit" mvn clean install -U  exec:java
+
+```
+
+### Testing
+
+To execute a single test:
+
+```bash
+MAVEN_OPTS="-Xmx1024M -Xss128M -XX:MaxPermSize=124M -XX:+CMSClassUnloadingEnabled" mvn  -Dtest=DivUtilsIT#test
+```

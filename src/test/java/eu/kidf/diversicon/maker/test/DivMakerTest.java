@@ -84,7 +84,7 @@ public class DivMakerTest {
     @Test
     @Ignore
     public void testDbToSql() {
-        DBConfig dbConfig = Diversicons.h2MakeDefaultInMemoryDbConfig("mydb", false);
+        DBConfig dbConfig = Diversicons.h2InMemoryConfig("mydb", false);
         Diversicons.dropCreateTables(dbConfig);
         Diversicon div = Diversicon.connectToDb(DivConfig.of(dbConfig));
         div.importXml("dumps/uby/uby-wn30.xml.xz");
@@ -98,7 +98,7 @@ public class DivMakerTest {
     @Test    
     @Ignore
     public void testConnectToDb() {
-        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig("~/Da/prj/diversicon/dumps/div-wn31", true);
+        DBConfig dbConfig = Diversicons.h2FileConfig("~/Da/prj/diversicon/dumps/div-wn31", true);
         Diversicon div = Diversicon.connectToDb(DivConfig.of(dbConfig));
                 
         div.getSession().close();
@@ -112,7 +112,7 @@ public class DivMakerTest {
     public void testRestoreFileDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         Diversicons.h2RestoreSql(DUMPS_DIVERSICON + WN30_DIV + ".zip",
-                DivConfig.of(Diversicons.h2MakeDefaultFileDbConfig(tempDir.toString() + "/temp-db", true)));
+                DivConfig.of(Diversicons.h2FileConfig(tempDir.toString() + "/temp-db", true)));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class DivMakerTest {
     public void testRestoreZipToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         Diversicons.h2RestoreSql(DUMPS_DIVERSICON + WN30_DIV + ".zip", 
-                DivConfig.of(Diversicons.h2MakeDefaultInMemoryDbConfig(tempDir.toString() + "/temp-db", 
+                DivConfig.of(Diversicons.h2InMemoryConfig(tempDir.toString() + "/temp-db", 
                         false)));
     }
     
@@ -129,7 +129,7 @@ public class DivMakerTest {
     public void testRestoreSqlToInMemoryDb() throws IOException {
         Path tempDir = Files.createTempDirectory("divmaker-test");
         Diversicons.h2RestoreSql(DUMPS_DIVERSICON + WN30_DIV + ".sql", 
-                DivConfig.of(Diversicons.h2MakeDefaultInMemoryDbConfig(tempDir.toString() + "/temp-db", false)));
+                DivConfig.of(Diversicons.h2InMemoryConfig(tempDir.toString() + "/temp-db", false)));
     }
 
    
@@ -148,7 +148,7 @@ public class DivMakerTest {
 
             LOG.info("Going to populate H2 DB " + outDb + "...");
 
-            DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(outDb, false);
+            DBConfig dbConfig = Diversicons.h2FileConfig(outDb, false);
 
             Diversicons.dropCreateTables(dbConfig);
 

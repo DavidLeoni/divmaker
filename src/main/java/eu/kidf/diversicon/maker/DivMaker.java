@@ -154,7 +154,7 @@ public class DivMaker {
         
         compress(xmlFile);        
         
-        DBConfig dbConfig = Diversicons.h2MakeDefaultFileDbConfig(DUMPS_DIV + lexRes.getName(), false);
+        DBConfig dbConfig = Diversicons.h2FileConfig(DUMPS_DIV + lexRes.getName(), false);
 
         Diversicons.createTables(dbConfig);
 
@@ -205,6 +205,8 @@ public class DivMaker {
             LOG.info("");
             LOG.info("****  DONE!!!   ALLELUJA!!!  ");
             LOG.info("");
+            LOG.info("NOTE: probably the db somehow was not closed properly, ");            
+            LOG.info("For more info about this, see https://github.com/diversicon-kb/divmaker/issues/2");
         }
 
     }

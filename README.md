@@ -3,10 +3,9 @@
 <br/>
 </p>
 
-#### About DivMaker
+#### About
 
-
-Quick and dirty Java command line app to generate lexicons. It is part of <a href="https://github.com/diversicon-kb/diversicon-core" target="_blank">Diversicon project</a>
+Quick and dirty Java command line app to generate lexicons. Part of [Diversicon tools](http://diversicon-kb.eu/tools#java-libraries).
 
 |**Usage**|**License**|**Roadmap**|**Contributing**|
 |-----------|---------|-----------|----------------|
